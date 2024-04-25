@@ -8,13 +8,20 @@ import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { expect } from '@jest/globals';
-import { SessionService } from 'src/app/services/session.service';
 
 import { LoginComponent } from './login.component';
+import { AuthService } from '../../services/auth.service';
+import { SessionService } from 'src/app/services/session.service';
+import { of, throwError } from 'rxjs';
+import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
+import { Router } from '@angular/router';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
+
+  let authService: AuthService;
+  let routerTest: Router;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -34,9 +41,38 @@ describe('LoginComponent', () => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    authService = TestBed.inject(AuthService);
+    routerTest = TestBed.inject(Router);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should display error when empty field', () => {
+    jest
+      .spyOn(authService, 'login')
+      .mockReturnValue(throwError(() => new Error('Connection failure')));
+    
+    component.submit();
+    expect(component.onError).toBe(true);
+  })
+
+  it('should login and navigate', () => {
+    component.form.controls['email'].setValue('yoga@studio.com');
+    component.form.controls['password'].setValue('test!1234');
+
+    const authServiceSpy = jest.spyOn(authService, 'login').mockImplementation(() => of({} as SessionInformation));
+    const routerTestSpy = jest.spyOn(routerTest, 'navigate').mockImplementation(async () => true);
+
+    component.submit();
+
+    expect(authServiceSpy).toHaveBeenCalledWith({
+      email: 'yoga@studio.com',
+      password: 'test!1234',
+    });
+    expect(routerTestSpy).toHaveBeenCalledWith(["/sessions"])
+    expect(component.onError).toBeFalsy();
   });
 });
