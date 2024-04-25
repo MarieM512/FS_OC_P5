@@ -21,7 +21,18 @@ describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
 
   let authService: AuthService;
+  let sessionService: SessionService;
   let routerTest: Router;
+
+  const mockUser: SessionInformation = {
+    token: "string",
+    type: "string",
+    id: 1,
+    username: "Johnny",
+    firstName: "John",
+    lastName: "Doe",
+    admin: true
+  }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -43,6 +54,7 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
 
     authService = TestBed.inject(AuthService);
+    sessionService = TestBed.inject(SessionService);
     routerTest = TestBed.inject(Router);
   });
 
@@ -63,7 +75,8 @@ describe('LoginComponent', () => {
     component.form.controls['email'].setValue('yoga@studio.com');
     component.form.controls['password'].setValue('test!1234');
 
-    const authServiceSpy = jest.spyOn(authService, 'login').mockImplementation(() => of({} as SessionInformation));
+    const authServiceSpy = jest.spyOn(authService, 'login').mockImplementation(() => of(mockUser));
+    const sessionServiceSpy = jest.spyOn(sessionService, 'logIn');
     const routerTestSpy = jest.spyOn(routerTest, 'navigate').mockImplementation(async () => true);
 
     component.submit();
@@ -72,6 +85,7 @@ describe('LoginComponent', () => {
       email: 'yoga@studio.com',
       password: 'test!1234',
     });
+    expect(sessionServiceSpy).toBeCalledWith(mockUser);
     expect(routerTestSpy).toHaveBeenCalledWith(["/sessions"])
     expect(component.onError).toBeFalsy();
   });
