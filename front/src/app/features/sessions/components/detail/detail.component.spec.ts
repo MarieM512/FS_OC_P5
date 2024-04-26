@@ -1,7 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterTestingModule, } from '@angular/router/testing';
 import { expect } from '@jest/globals'; 
 import { SessionService } from '../../../../services/session.service';
@@ -11,13 +11,15 @@ import { By } from '@angular/platform-browser';
 import { Session } from '../../interfaces/session.interface';
 import { of } from 'rxjs';
 import { SessionApiService } from '../../services/session-api.service';
+import { Router } from '@angular/router';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { TeacherService } from 'src/app/services/teacher.service';
 
 
 describe('DetailComponent', () => {
   let component: DetailComponent;
   let fixture: ComponentFixture<DetailComponent>; 
-  let service: SessionService;
+  let router: Router;
 
   const mockSession: Session = {
     name: 'Session 1',
@@ -32,6 +34,8 @@ describe('DetailComponent', () => {
   const mockSessionApiService = {
     detail: jest.fn().mockReturnValue(of(mockSession)),
     delete: jest.fn().mockReturnValue(of({})),
+    participate: jest.fn().mockImplementation(() => of(undefined)),
+    unParticipate: jest.fn().mockImplementation(() => of(undefined))
   };
 
   const mockSessionService = {
@@ -39,6 +43,22 @@ describe('DetailComponent', () => {
       admin: true,
       id: 1
     }
+  }
+
+  const mockSnackBar = {
+    open: jest.fn().mockImplementation()
+  }
+
+  const mockTeacher = {
+    id: 1,
+    lastName: 'Plaza',
+    firstName: 'Steph',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+
+  const mockTeacherService = {
+    detail: jest.fn().mockImplementation(() => of(mockTeacher))
   }
 
   beforeEach(async () => {
@@ -50,18 +70,25 @@ describe('DetailComponent', () => {
         ReactiveFormsModule
       ],
       declarations: [DetailComponent], 
-      providers: [{ provide: SessionService, useValue: mockSessionService }, { provide: SessionApiService, useValue: mockSessionApiService }],
+      providers: [
+        { provide: SessionService, useValue: mockSessionService }, 
+        { provide: SessionApiService, useValue: mockSessionApiService },
+        { provide: MatSnackBar, useValue: mockSnackBar },
+        { provide: TeacherService, useValue: mockTeacherService }
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
       .compileComponents();
-      service = TestBed.inject(SessionService);
+
     fixture = TestBed.createComponent(DetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    router = TestBed.inject(Router);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+    expect(mockTeacherService.detail).toHaveBeenCalled();
   });
 
   it('should display delete button when user is an admin', () => {
@@ -92,9 +119,41 @@ describe('DetailComponent', () => {
   })
 
   it('should delete a session', () => {
-    component.sessionId = '1';
+    const routerSpy = jest.spyOn(router, 'navigate').mockImplementation(async () => true);
+
     component.delete();
-    expect(mockSessionApiService.delete).toHaveBeenCalledWith('1');
+
+    expect(mockSessionApiService.delete).toHaveBeenCalled();
+    expect(mockSnackBar.open).toHaveBeenCalled();
+    expect(routerSpy).toHaveBeenCalledWith(['sessions']);
+  })
+
+  it('should go back', () => {
+    const spy = jest.spyOn(window.history, 'back').mockImplementation(() => {});
+
+    component.back();
+
+    expect(spy).toHaveBeenCalled();
+  })
+
+  it('should participate', () => {
+    component.sessionId = '1';
+    component.userId = '2';
+
+    component.participate();
+
+    expect(mockSessionApiService.participate).toHaveBeenCalledWith('1', '2');
+    expect(component.session).toEqual(mockSession);
+  })
+
+  it('should unparticipate', () => {
+    component.sessionId = '1';
+    component.userId = '2';
+
+    component.unParticipate();
+
+    expect(mockSessionApiService.unParticipate).toHaveBeenCalledWith('1', '2');
+    expect(component.session).toEqual(mockSession);
   })
 });
 
