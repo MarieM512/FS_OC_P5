@@ -14,16 +14,35 @@ import { SessionService } from 'src/app/services/session.service';
 import { SessionApiService } from '../../services/session-api.service';
 
 import { FormComponent } from './form.component';
+import { Router } from '@angular/router';
+import { of } from 'rxjs';
+import { Session } from '../../interfaces/session.interface';
 
 describe('FormComponent', () => {
   let component: FormComponent;
   let fixture: ComponentFixture<FormComponent>;
+  let router: Router;
 
   const mockSessionService = {
     sessionInformation: {
       admin: true
     }
   } 
+
+  const mockSession: Session = {
+    id: 1,
+    name: 'Session 1',
+    date: new Date(),
+    description: 'Description',
+    users: Array(10).fill({}),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    teacher_id: 1,
+  };
+
+  const mockSessionApiService = {
+    detail: jest.fn().mockReturnValue(of(mockSession))
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -42,7 +61,7 @@ describe('FormComponent', () => {
       ],
       providers: [
         { provide: SessionService, useValue: mockSessionService },
-        SessionApiService
+        { provide: SessionApiService, useValue: mockSessionApiService }
       ],
       declarations: [FormComponent]
     })
@@ -51,9 +70,32 @@ describe('FormComponent', () => {
     fixture = TestBed.createComponent(FormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    router = TestBed.inject(Router);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  // it('should naviagte to sessions when user is not an admin', () => {
+  //   const routerSpy = jest.spyOn(router, 'navigate').mockImplementation(async () => true);
+  //   mockSessionService.sessionInformation =  {
+  //     admin: false
+  //   }
+
+  //   component.ngOnInit();
+
+  //   expect(routerSpy).toHaveBeenCalledWith(['/sessions']);
+  // })
+
+  it('should retrieve all values if update', () => {
+    jest.spyOn(router, 'url', 'get').mockReturnValue('/update');
+
+    component.ngOnInit();
+
+    expect(router.url).toBe('/update');
+    expect(component.onUpdate).toBeTruthy();
+    expect(mockSessionApiService.detail).toHaveBeenCalled();
+    expect(component.sessionForm?.value.name).toEqual(mockSession.name)
+  })
 });
