@@ -21,12 +21,12 @@ describe('DetailComponent', () => {
 
   const mockSession: Session = {
     name: 'Session 1',
-    date: new Date(2024, 3, 6),
-    description: 'Première session',
+    date: new Date(),
+    description: 'Description',
     users: Array(10).fill({}),
-    createdAt: new Date(2024, 2, 20),
-    updatedAt: new Date(2024, 3, 1),
-    teacher_id: 2,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    teacher_id: 1,
   };
 
   const mockSessionApiService = {
@@ -81,6 +81,20 @@ describe('DetailComponent', () => {
         .queryAll(By.css('button'))
         .find((button) => button.nativeElement.textContent.includes('delete'))
     ).toBeFalsy();
+  })
+
+  it('should display information about session', () => {
+    const sessionNameElement = fixture.debugElement.query(By.css('h1')).nativeElement;
+    expect(sessionNameElement.textContent).toContain('Session 1');
+
+    const sessionDescriptionElement = fixture.debugElement.query(By.css('.description')).nativeElement;
+    expect(sessionDescriptionElement.textContent).toContain('Description');
+  })
+
+  it('should delete a session', () => {
+    component.sessionId = '1';
+    component.delete();
+    expect(mockSessionApiService.delete).toHaveBeenCalledWith('1');
   })
 });
 
