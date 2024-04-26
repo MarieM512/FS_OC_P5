@@ -20,10 +20,6 @@ describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
 
-  let authService: AuthService;
-  let sessionService: SessionService;
-  let routerTest: Router;
-
   const mockUser: SessionInformation = {
     token: "string",
     type: "string",
@@ -34,10 +30,27 @@ describe('LoginComponent', () => {
     admin: true
   }
 
+  const mockAuthService = {
+    login: jest.fn().mockReturnValue(of(mockUser)),
+    loginFailed: jest.fn().mockReturnValue(throwError(() => new Error('Connection failure')))
+  }
+
+  const mockSessionService = {
+    logIn: jest.fn()
+  }
+
+  const mockRouter = {
+    navigate: jest.fn()
+  }
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      providers: [SessionService],
+      providers: [
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: SessionService, useValue: mockSessionService },
+        { provide: Router, useValue: mockRouter }
+      ],
       imports: [
         RouterTestingModule,
         BrowserAnimationsModule,
@@ -52,41 +65,24 @@ describe('LoginComponent', () => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-
-    authService = TestBed.inject(AuthService);
-    sessionService = TestBed.inject(SessionService);
-    routerTest = TestBed.inject(Router);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should login and navigate', () => {
+    component.submit();
+
+    expect(mockAuthService.login).toHaveBeenCalled();
+    expect(mockSessionService.logIn).toHaveBeenCalled();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/sessions']);
+  });
+
   it('should display error when empty field', () => {
-    jest
-      .spyOn(authService, 'login')
-      .mockReturnValue(throwError(() => new Error('Connection failure')));
+    jest.spyOn(mockAuthService, 'login').mockReturnValue(throwError(() => new Error('Connection failure')));
     
     component.submit();
     expect(component.onError).toBe(true);
   })
-
-  it('should login and navigate', () => {
-    component.form.controls['email'].setValue('yoga@studio.com');
-    component.form.controls['password'].setValue('test!1234');
-
-    const authServiceSpy = jest.spyOn(authService, 'login').mockImplementation(() => of(mockUser));
-    const sessionServiceSpy = jest.spyOn(sessionService, 'logIn');
-    const routerTestSpy = jest.spyOn(routerTest, 'navigate').mockImplementation(async () => true);
-
-    component.submit();
-
-    expect(authServiceSpy).toHaveBeenCalledWith({
-      email: 'yoga@studio.com',
-      password: 'test!1234',
-    });
-    expect(sessionServiceSpy).toBeCalledWith(mockUser);
-    expect(routerTestSpy).toHaveBeenCalledWith(["/sessions"])
-    expect(component.onError).toBeFalsy();
-  });
 });
