@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { expect } from '@jest/globals';
@@ -40,9 +40,25 @@ describe('FormComponent', () => {
     teacher_id: 1,
   };
 
-  const mockSessionApiService = {
-    detail: jest.fn().mockReturnValue(of(mockSession))
+  const mockSessionModified: Session = {
+    id: 1,
+    name: 'Session 1',
+    date: new Date(),
+    description: 'Description modified',
+    users: Array(10).fill({}),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    teacher_id: 1,
   };
+
+  const mockSessionApiService = {
+    detail: jest.fn().mockReturnValue(of(mockSession)),
+    update: jest.fn().mockReturnValue(of(mockSessionModified))
+  };
+
+  const mockSnackBar = {
+    open: jest.fn().mockImplementation()
+  }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -61,7 +77,8 @@ describe('FormComponent', () => {
       ],
       providers: [
         { provide: SessionService, useValue: mockSessionService },
-        { provide: SessionApiService, useValue: mockSessionApiService }
+        { provide: SessionApiService, useValue: mockSessionApiService },
+        { provide: MatSnackBar, useValue: mockSnackBar },
       ],
       declarations: [FormComponent]
     })
@@ -79,13 +96,13 @@ describe('FormComponent', () => {
 
   // it('should naviagte to sessions when user is not an admin', () => {
   //   const routerSpy = jest.spyOn(router, 'navigate').mockImplementation(async () => true);
-  //   mockSessionService.sessionInformation =  {
-  //     admin: false
-  //   }
+    // mockSessionService.sessionInformation =  {
+    //   admin: false
+    // }
 
   //   component.ngOnInit();
 
-  //   expect(routerSpy).toHaveBeenCalledWith(['/sessions']);
+  //   expect(routerSpy).toHaveBeenCalledWith(['sessions']);
   // })
 
   it('should retrieve all values if update', () => {
@@ -97,5 +114,16 @@ describe('FormComponent', () => {
     expect(component.onUpdate).toBeTruthy();
     expect(mockSessionApiService.detail).toHaveBeenCalled();
     expect(component.sessionForm?.value.name).toEqual(mockSession.name)
+  })
+
+  it('should submit when update', () => {
+    const routerSpy = jest.spyOn(router, 'navigate').mockImplementation(async () => true);
+    component.onUpdate = true
+
+    component.submit();
+
+    expect(mockSessionApiService.update).toHaveBeenCalled();
+    expect(mockSnackBar.open).toHaveBeenCalled();
+    expect(routerSpy).toHaveBeenCalledWith(['sessions']);
   })
 });
