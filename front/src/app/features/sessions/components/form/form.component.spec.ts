@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {  ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -53,7 +53,8 @@ describe('FormComponent', () => {
 
   const mockSessionApiService = {
     detail: jest.fn().mockReturnValue(of(mockSession)),
-    update: jest.fn().mockReturnValue(of(mockSessionModified))
+    update: jest.fn().mockReturnValue(of(mockSessionModified)),
+    create: jest.fn().mockReturnValue(of(mockSession))
   };
 
   const mockSnackBar = {
@@ -94,17 +95,6 @@ describe('FormComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // it('should naviagte to sessions when user is not an admin', () => {
-  //   const routerSpy = jest.spyOn(router, 'navigate').mockImplementation(async () => true);
-    // mockSessionService.sessionInformation =  {
-    //   admin: false
-    // }
-
-  //   component.ngOnInit();
-
-  //   expect(routerSpy).toHaveBeenCalledWith(['sessions']);
-  // })
-
   it('should retrieve all values if update', () => {
     jest.spyOn(router, 'url', 'get').mockReturnValue('/update');
 
@@ -123,6 +113,16 @@ describe('FormComponent', () => {
     component.submit();
 
     expect(mockSessionApiService.update).toHaveBeenCalled();
+    expect(mockSnackBar.open).toHaveBeenCalled();
+    expect(routerSpy).toHaveBeenCalledWith(['sessions']);
+  })
+
+  it('should submit to create', () => {
+    const routerSpy = jest.spyOn(router, 'navigate').mockImplementation(async () => true);
+
+    component.submit();
+
+    expect(mockSessionApiService.create).toHaveBeenCalled();
     expect(mockSnackBar.open).toHaveBeenCalled();
     expect(routerSpy).toHaveBeenCalledWith(['sessions']);
   })
