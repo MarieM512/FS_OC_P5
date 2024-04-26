@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,18 +12,29 @@ import { RegisterComponent } from './register.component';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
 
-  let authService: AuthService;
-  let routerTest: Router;
+  const mockAuthService = {
+    register: jest.fn().mockImplementation(() => of(undefined))
+  }
+
+  const mockRouter = {
+    navigate: jest.fn()
+  }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
+      providers: [
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: Router, useValue: mockRouter }
+      ],
       imports: [
+        RouterTestingModule,
         BrowserAnimationsModule,
         HttpClientModule,
         ReactiveFormsModule,  
@@ -38,32 +49,26 @@ describe('RegisterComponent', () => {
     fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-
-    authService = TestBed.inject(AuthService);
-    routerTest = TestBed.inject(Router);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should register and navigate', () => {
+    component.submit();
+
+    expect(mockAuthService.register).toHaveBeenCalled();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login'])
+    expect(component.onError).toBeFalsy();
+  })
+
   it('should display error when empty field', () => {
-    const authServiceSpy = jest.spyOn(authService, 'register').mockReturnValue(throwError(() => new Error('Connection failure')));
+    jest.spyOn(mockAuthService, 'register').mockReturnValue(throwError(() => new Error('Connection failure')));
     
     component.submit();
 
-    expect(authServiceSpy).toBeCalled()
     expect(component.onError).toBeTruthy();
   })
 
-  it('should register and navigate', () => {
-    const authServiceSpy = jest.spyOn(authService, 'register').mockImplementation(() => of(undefined));
-    const routerTestSpy = jest.spyOn(routerTest, 'navigate').mockImplementation(async () => true);
-
-    component.submit();
-
-    expect(authServiceSpy).toBeCalled();
-    expect(routerTestSpy).toHaveBeenCalledWith(["/login"])
-    expect(component.onError).toBeFalsy();
-  })
 });
