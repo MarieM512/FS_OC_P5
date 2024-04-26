@@ -31,8 +31,7 @@ describe('LoginComponent', () => {
   }
 
   const mockAuthService = {
-    login: jest.fn().mockReturnValue(of(mockUser)),
-    loginFailed: jest.fn().mockReturnValue(throwError(() => new Error('Connection failure')))
+    login: jest.fn().mockReturnValue(of(mockUser))
   }
 
   const mockSessionService = {
