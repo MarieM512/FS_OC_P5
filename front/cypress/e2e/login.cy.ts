@@ -1,14 +1,6 @@
 describe('Login spec', () => {
   it('Login successfull', () => {
-    cy.visit('/login')
-
-    cy.intercept('POST', '/api/auth/login', {}).as('login')
-    cy.intercept('GET', '/api/session', []).as('sessions')
-
-    cy.get('input[formControlName=email]').type("yoga@studio.com")
-    cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
-
-    cy.url().should('include', '/sessions')
+    cy.login(true)
   })
 
   it('Should display error when wrong password', () => {
