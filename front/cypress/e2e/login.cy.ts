@@ -41,7 +41,7 @@ describe('Login spec', () => {
 
     cy.get(':button').should('be.disabled')
 
-    cy.get('input[formControlName=password').type(`${"test1234"}`)
+    cy.get('input[formControlName=password').type("test1234")
 
     cy.get(':button').should('be.not.disabled')
   })
