@@ -1,27 +1,26 @@
 describe('Login spec', () => {
   it('Login successfull', () => {
+    cy.login(true, false)
+  })
+
+  it('Should display error when wrong password', () => {
     cy.visit('/login')
 
-    cy.intercept('POST', '/api/auth/login', {
-      body: {
-        id: 1,
-        username: 'userName',
-        firstName: 'firstName',
-        lastName: 'lastName',
-        admin: true
-      },
-    })
+    cy.get('input[formControlName=email').type("yoga@studio.com")
+    cy.get('input[formControlName=password').type(`${"test1234"}{enter}{enter}`)
 
-    cy.intercept(
-      {
-        method: 'GET',
-        url: '/api/session',
-      },
-      []).as('session')
+    cy.get('.error').contains('An error occurred')
+  })
 
-    cy.get('input[formControlName=email]').type("yoga@studio.com")
-    cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+  it('Should disable submit button when empty field', () => {
+    cy.visit('/login')
 
-    cy.url().should('include', '/sessions')
+    cy.get('input[formControlName=email').type("yoga@studio.com")
+
+    cy.get(':button').should('be.disabled')
+
+    cy.get('input[formControlName=password').type("test1234")
+
+    cy.get(':button').should('be.not.disabled')
   })
 });
