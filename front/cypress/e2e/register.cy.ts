@@ -2,7 +2,7 @@ describe('Register spec', () => {
     it('Register successfull', () => {
         cy.visit('/register')
 
-        cy.intercept('POST', '/api/auth/register', {})
+        cy.intercept('POST', '/api/auth/register', {}).as('register')
   
         cy.get('input[formControlName=firstName]').type("John")
         cy.get('input[formControlName=lastName]').type("Doe")
