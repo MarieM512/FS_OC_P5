@@ -1,6 +1,6 @@
 describe('Login spec', () => {
   it('Login successfull', () => {
-    cy.login(true)
+    cy.login(true, false)
   })
 
   it('Should display error when wrong password', () => {

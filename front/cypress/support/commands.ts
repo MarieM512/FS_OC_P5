@@ -43,11 +43,22 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 declare namespace Cypress {
     interface Chainable {
-      login(admin: boolean): typeof login
+      login(admin: boolean, sessions: boolean): typeof login
     }
 }
 
-function login(admin: boolean): void {
+const mockSession = {
+    id: 1,
+    name: 'Session 1',
+    date: new Date(),
+    description: 'Description',
+    users: [1, 2, 3],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    teacher_id: 1,
+}
+
+function login(admin: boolean, sessions: boolean): void {
     cy.visit('/login')
 
     cy.intercept('POST', '/api/auth/login', { 
@@ -57,7 +68,12 @@ function login(admin: boolean): void {
         lastName: 'Doe',
         admin: admin
      }).as('login')
-    cy.intercept('GET', '/api/session', []).as('sessions')
+
+    if (sessions) {
+        cy.intercept('GET', '/api/session', [mockSession]).as('sessions')
+    } else {
+        cy.intercept('GET', '/api/session', []).as('sessions')
+    }
 
     cy.get('input[formControlName=email]').type("yoga@studio.com")
     cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
