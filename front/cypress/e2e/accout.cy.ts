@@ -1,5 +1,5 @@
 describe('Account spec', () => {
-    it('Ge me admin successfull', () => {
+    it('Get me admin successfull', () => {
         cy.visit('/login')
 
         cy.intercept('POST', '/api/auth/login', {
@@ -43,7 +43,7 @@ describe('Account spec', () => {
           cy.get('.my2').contains('You are admin')
     })
 
-    it('Ge me no admin successfull', () => {
+    it('Get me no admin successfull', () => {
         cy.visit('/login')
 
         cy.intercept('POST', '/api/auth/login', {
