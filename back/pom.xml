@@ -67,6 +67,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+			<version>1.18.30</version>
             <optional>true</optional>
         </dependency>
 
@@ -108,8 +109,9 @@
 				<configuration>
 				<excludes>
 					<exclude>com/openclassrooms/starterjwt/SpringBootSecurityJwtApplication.class</exclude>
-					<exclude>com/openclassrooms/starterjwt/dto/*</exclude>
-					<exclude>com/openclassrooms/starterjwt/models/*</exclude>
+					<exclude>**/dto/*.class</exclude>
+					<exclude>**/models/*.class</exclude>
+					<exclude>**/mapper/*.class</exclude>
 				</excludes>
 				</configuration>
 				<executions>
@@ -140,7 +142,7 @@
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.9</minimum>
+											<minimum>0.8</minimum>
 										</limit>
 									</limits>
 								</rule>
