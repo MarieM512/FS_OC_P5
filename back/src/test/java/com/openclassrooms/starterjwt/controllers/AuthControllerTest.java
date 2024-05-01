@@ -107,4 +107,23 @@ public class AuthControllerTest {
         verify(repository).existsByEmail(mockSignupRequest.getEmail());
         verify(repository).save(mockUser);
     }
+
+    @Test
+    void testRegisterWithEmailAlreadyTaken() {
+        SignupRequest mockSignupRequest = new SignupRequest();
+        mockSignupRequest.setEmail("test@oc.com");
+        mockSignupRequest.setFirstName("John");
+        mockSignupRequest.setLastName("Doe");
+        mockSignupRequest.setPassword("password");
+        
+        when(repository.existsByEmail(mockSignupRequest.getEmail())).thenReturn(true);
+
+        ResponseEntity<?> response = controller.registerUser(mockSignupRequest);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        MessageResponse messageResponse = (MessageResponse) response.getBody();
+        assertEquals("Error: Email is already taken!", messageResponse.getMessage());
+
+        verify(repository).existsByEmail(mockSignupRequest.getEmail());
+    }
 }
