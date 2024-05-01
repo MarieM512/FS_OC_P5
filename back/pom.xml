@@ -116,8 +116,10 @@
 				<excludes>
 					<exclude>com/openclassrooms/starterjwt/SpringBootSecurityJwtApplication.class</exclude>
 					<exclude>**/dto/*.class</exclude>
-					<exclude>**/models/*.class</exclude>
 					<exclude>**/mapper/*.class</exclude>
+					<exclude>**/models/*.class</exclude>
+					<exclude>**/exception/*.class</exclude>
+					<exclude>**/payload/**</exclude>
 				</excludes>
 				</configuration>
 				<executions>
