@@ -1,6 +1,7 @@
 package com.openclassrooms.starterjwt.security.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -62,6 +63,8 @@ public class UserDetailsImplTest {
 
         assertEquals(mockUserDetails, userId1);
         assertNotEquals(mockUserDetails, userId2);
+        assertTrue(mockUserDetails.equals(mockUserDetails));
+        assertFalse(mockUserDetails.equals(null));
     }
 
 }
