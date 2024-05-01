@@ -3,6 +3,7 @@ package com.openclassrooms.starterjwt.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -17,10 +18,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.payload.request.LoginRequest;
+import com.openclassrooms.starterjwt.payload.request.SignupRequest;
 import com.openclassrooms.starterjwt.payload.response.JwtResponse;
+import com.openclassrooms.starterjwt.payload.response.MessageResponse;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
 import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
@@ -39,13 +43,16 @@ public class AuthControllerTest {
     @Mock
     private UserRepository repository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testLoginSuccessfull() {
+    void testLogin() {
         LoginRequest mockLoginRequest = new LoginRequest();
         mockLoginRequest.setEmail("test@oc.com");
         mockLoginRequest.setPassword("password");
@@ -70,9 +77,34 @@ public class AuthControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         JwtResponse jwtResponse = (JwtResponse) response.getBody();
         assertEquals(jwtToken, jwtResponse.getToken());
+
         assertEquals(mockUser.getId(), jwtResponse.getId());
         assertEquals(mockUser.getEmail(), jwtResponse.getUsername());
         assertEquals(mockUser.getFirstName(), jwtResponse.getFirstName());
         assertEquals(mockUser.getLastName(), jwtResponse.getLastName());
+    }
+
+    @Test
+    void testRegisterSuccessfull() {
+        SignupRequest mockSignupRequest = new SignupRequest();
+        mockSignupRequest.setEmail("test@oc.com");
+        mockSignupRequest.setFirstName("John");
+        mockSignupRequest.setLastName("Doe");
+        mockSignupRequest.setPassword("password");
+
+        String passwordEncoded = "passwordEncoded";
+        when(passwordEncoder.encode(any(CharSequence.class))).thenReturn(passwordEncoded);
+        User mockUser = new User(mockSignupRequest.getEmail(), mockSignupRequest.getLastName(), mockSignupRequest.getFirstName(), passwordEncoder.encode(mockSignupRequest.getPassword()), false);
+        
+        when(repository.existsByEmail(mockSignupRequest.getEmail())).thenReturn(false);
+
+        ResponseEntity<?> response = controller.registerUser(mockSignupRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        MessageResponse messageResponse = (MessageResponse) response.getBody();
+        assertEquals("User registered successfully!", messageResponse.getMessage());
+
+        verify(repository).existsByEmail(mockSignupRequest.getEmail());
+        verify(repository).save(mockUser);
     }
 }
