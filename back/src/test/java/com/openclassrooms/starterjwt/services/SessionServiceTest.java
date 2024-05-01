@@ -37,7 +37,7 @@ public class SessionServiceTest {
     private Session mockSessionUpdated = new Session();
     private User mockUser = new User();
 
-     @BeforeEach
+    @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
