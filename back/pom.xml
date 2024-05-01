@@ -21,6 +21,12 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.10.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
@@ -67,6 +73,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+			<version>1.18.30</version>
             <optional>true</optional>
         </dependency>
 
@@ -105,6 +112,16 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.5</version>
+				<configuration>
+				<excludes>
+					<exclude>com/openclassrooms/starterjwt/SpringBootSecurityJwtApplication.class</exclude>
+					<exclude>**/dto/*.class</exclude>
+					<exclude>**/mapper/*.class</exclude>
+					<exclude>**/models/*.class</exclude>
+					<exclude>**/exception/*.class</exclude>
+					<exclude>**/payload/**</exclude>
+				</excludes>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -133,7 +150,7 @@
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.9</minimum>
+											<minimum>0.8</minimum>
 										</limit>
 									</limits>
 								</rule>

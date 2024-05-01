@@ -7,7 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 describe('SessionsService', () => {
   let service: SessionApiService;
-  let httpMock: HttpTestingController
+  let httpMock: HttpTestingController;
 
   const mockSessions = [
     {
