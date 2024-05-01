@@ -71,6 +71,7 @@ public class SessionControllerTest {
         ResponseEntity<?> response = controller.findAll();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(service).findAll();
         verify(mapper).toDto(sessions);
     }
 
