@@ -126,4 +126,4 @@ npm run e2e
 npm run e2e:coverage
 ```
 
-Go to `front/coverage/lcvov-report` and open `index.html` in web browser to see the coverage.
+Go to `front/coverage/lcov-report` and open `index.html` in web browser to see the coverage.
