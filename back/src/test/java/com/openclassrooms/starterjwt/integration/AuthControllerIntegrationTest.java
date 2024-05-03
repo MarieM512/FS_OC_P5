@@ -43,12 +43,12 @@ public class AuthControllerIntegrationTest {
     private SignupRequest mockSignupRequest = new SignupRequest();
 
     @AfterEach
-    public void cleanUp() {
+    void cleanUp() {
         userRepository.deleteAll();
     }
 
     @Test
-    public void testAuthenticateUser() {
+    void testAuthenticateUser() {
         mockLoginRequest.setEmail(email);
         mockLoginRequest.setPassword(password);
         mockUser.setEmail(email);
@@ -74,7 +74,7 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    public void testRegisterUser() {
+    void testRegisterUser() {
         mockSignupRequest.setEmail(email);
         mockSignupRequest.setPassword(password);
         mockSignupRequest.setLastName(lastName);
@@ -91,7 +91,7 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    public void testRegisterWithEmailAlreadyTaken() {
+    void testRegisterWithEmailAlreadyTaken() {
         mockSignupRequest.setEmail(email);
         mockSignupRequest.setPassword(password);
         mockSignupRequest.setLastName(lastName);
