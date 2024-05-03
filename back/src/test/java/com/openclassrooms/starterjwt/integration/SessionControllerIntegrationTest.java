@@ -32,7 +32,6 @@ import com.openclassrooms.starterjwt.repository.TeacherRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = Replace.NONE)
 public class SessionControllerIntegrationTest {
 
     @Autowired
