@@ -37,9 +37,9 @@ public class TeacherMapperTest {
         mockTeacherDto.setLastName("Doe");
         mockTeacherDto.setFirstName("John");
 
-        mockTeacher2.setId(2L);
+        mockTeacherDto2.setId(2L);
         mockTeacherDto2.setLastName("Smith");
-        mockTeacherDto2.setLastName("Will");
+        mockTeacherDto2.setFirstName("Will");
     }
 
     @Test
@@ -80,7 +80,7 @@ public class TeacherMapperTest {
         List<TeacherDto> teacherDtoList = mapper.toDto(teacherList);
 
         for(int i = 0; i < teacherList.size(); i++) {
-            assertEquals(teacherList.get(i).getId(), teacherDtoList.get(i).getId()) ;
+            assertEquals(teacherList.get(i).getId(), teacherDtoList.get(i).getId());
             assertEquals(teacherList.get(i).getLastName(), teacherDtoList.get(i).getLastName());
             assertEquals(teacherList.get(i).getFirstName(), teacherDtoList.get(i).getFirstName());
         }
