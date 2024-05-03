@@ -110,6 +110,8 @@ npm run test
 npm run test:coverage
 ```
 
+Go to `front/coverage/jest/lcov-report` and open `index.html` in web browser to see the coverage.
+
 ### End-to-end
 
 #### Run
